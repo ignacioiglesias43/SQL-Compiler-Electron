@@ -21,3 +21,5 @@ yarn-error.log*
 *.sw?
 
 .history/*
+#Electron-builder output
+/dist_electron
