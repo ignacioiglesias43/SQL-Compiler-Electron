@@ -204,7 +204,7 @@ const tokens = [
     type: 6
   },
   {
-    regex: /^•/,
+    regex: /•/,
     value: "n",
     code: 62,
     type: 6
