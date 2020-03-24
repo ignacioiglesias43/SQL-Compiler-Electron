@@ -11,7 +11,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="error in errors" :key="error.name">
+          <tr v-for="error in errors" :key="error.id">
             <td>{{ error.type }}</td>
             <td>{{ error.code }}</td>
             <td>{{ error.value }}</td>
@@ -24,25 +24,20 @@
 </template>
 
 <script>
+import { mapState, mapMutations } from "vuex";
 export default {
   name: "ErrorTable",
-  data() {
-    return {
-      errors: [
-        {
-          type: 1,
-          code: 100,
-          value: "Sin error",
-          line: ":)"
-        },
-        {
-          type: 2,
-          code: 200,
-          value: "Sin error",
-          line: ":)"
-        }
-      ]
-    };
+  computed: {
+    ...mapState("errorTable", ["errorTableData"]),
+    ...mapMutations("errorTable", ["SET_ERROR_TABLE_DATA"]),
+    errors: {
+      get() {
+        return this.errorTableData;
+      },
+      set(error) {
+        this.SET_ERROR_TABLE_DATA(error);
+      }
+    }
   }
 };
 </script>

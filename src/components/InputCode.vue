@@ -1,17 +1,29 @@
 <template>
   <v-container fluid>
-    <v-textarea :height="height" filled no-resize outlined :value="value" />
+    <v-textarea :height="height" filled no-resize outlined v-model="value" />
   </v-container>
 </template>
 
 <script>
+import { mapState, mapMutations } from "vuex";
 export default {
   name: "InputCode",
   data: () => ({
-    value: `SELECT ANOMBRE, CALIFICACION, TURNO FROM ALUMNOS, INSCRITOS, MATERIAS,
-CARRERAS WHERE MNOMBRE = 'LENAUT2' AND TURNO = 'TM' AND CNOMBRE='ISC'
-AND SEMESTRE='2017II' AND CALIFICACION >=70`,
     height: "300"
-  })
+  }),
+  computed: {
+    ...mapState("inputCode", ["sampleText"]),
+    value: {
+      get() {
+        return this.sampleText;
+      },
+      set(newText) {
+        this.SET_SAMPLE_TEXT(newText);
+      }
+    }
+  },
+  methods: {
+    ...mapMutations("inputCode", ["SET_SAMPLE_TEXT"])
+  }
 };
 </script>
