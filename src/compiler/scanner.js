@@ -1,4 +1,4 @@
-import { tokens } from "./tokens";
+import { tokens } from "./utils/tokens";
 let tokenList = [],
   errorList = [];
 var BreakException = {};
@@ -13,7 +13,7 @@ export default {
     let comienzo = "(?:^|')";
     let fin = "(?:$|')";
     let str = dataChanged.split(/('.*?')/); //Separa por palabras
-    str.forEach(s => {
+    str.forEach((s) => {
       //Busca constante alfanumerica
       /**s: palabra
        * newWord: palabra resultante
@@ -34,8 +34,8 @@ export default {
     dataChanged = dataChanged.replace(/(?<=\w|#)=/, " = ");
     dataChanged = dataChanged.replace(/>=/, " >= ");
     dataChanged = dataChanged.replace(/<=/, " <= ");
-    dataChanged = dataChanged.replace(/</, " < ");
-    dataChanged = dataChanged.replace(/>/, " > ");
+    dataChanged = dataChanged.replace(/^</, " < ");
+    dataChanged = dataChanged.replace(/^>/, " > ");
     dataChanged = dataChanged.replace(/\+/, " + ");
     dataChanged = dataChanged.replace(/-/, " - ");
     dataChanged = dataChanged.replace(/\*/, " * ");
@@ -47,17 +47,17 @@ export default {
     errorList = [];
     let renglones = data.split(/\n/);
     let line = 1;
-    renglones.forEach(renglon => {
+    renglones.forEach((renglon) => {
       let cadena = this.changeQuoteMarks(renglon);
       cadena = cadena.split(/(\s+|,|\(|\)|')/);
-      cadena.forEach(element => {
+      cadena.forEach((element) => {
         element = element.replace(/\s+/, "");
         if (element !== "") {
           let tokens;
           //Ejemplo: A.Alumno
           if (element.match(/^[A-Za-z_]+\.(\w+)[#]?/)) {
             tokens = element.split(/(\.)/);
-            tokens.forEach(token => {
+            tokens.forEach((token) => {
               this.addTokenToList(token, line);
             });
           }
@@ -77,9 +77,9 @@ export default {
                 value: "Sin error",
                 line: ":)",
                 code: 100,
-                type: 1
-              }
-            ]
+                type: 1,
+              },
+            ],
     };
     return result;
   },
@@ -96,7 +96,7 @@ export default {
   getToken(token, line) {
     let Token = {};
     try {
-      tokens.forEach(t => {
+      tokens.forEach((t) => {
         if (token.toUpperCase().match(t.regex)) {
           let value;
           if (t.value !== "n") {
@@ -110,7 +110,7 @@ export default {
             value: value,
             code: t.code,
             type: t.type,
-            line: line
+            line: line,
           };
           throw BreakException;
         }
@@ -125,11 +125,11 @@ export default {
       value: "Error léxico: " + token,
       line: line,
       code: 101,
-      type: 1
+      type: 1,
     };
     errorList.push(error);
   },
   getError() {
     return errorList;
-  }
+  },
 };

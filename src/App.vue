@@ -12,7 +12,9 @@
         />
       </div>
       <v-spacer></v-spacer>
-      <v-btn icon @click="compile"><v-icon>mdi-play</v-icon></v-btn>
+      <v-btn icon @click="compile">
+        <v-icon>mdi-play</v-icon>
+      </v-btn>
     </v-app-bar>
     <v-content>
       <Input-Code />
@@ -24,28 +26,28 @@
 import InputCode from "./components/InputCode";
 import ErrorTable from "./components/ErrorTable";
 import Scanner from "../src/compiler/scanner";
+import Parser from "../src/compiler/parser";
 import { mapState, mapMutations } from "vuex";
 export default {
   name: "App",
   components: {
     InputCode,
-    ErrorTable
+    ErrorTable,
   },
   computed: {
     ...mapState("inputCode", ["sampleText"]),
     ...mapState("errorTable", ["errorTableData"]),
     value() {
       return this.sampleText;
-    }
+    },
   },
   methods: {
     ...mapMutations("errorTable", ["SET_ERROR_TABLE_DATA"]),
     compile(event) {
       event.preventDefault();
-      const result = Scanner.scan(this.value);
-      this.SET_ERROR_TABLE_DATA(result.errors);
-      console.log(result);
-    }
-  }
+      const result = Parser.algorithm(Scanner.scan(this.value));
+      this.SET_ERROR_TABLE_DATA(result);
+    },
+  },
 };
 </script>
