@@ -19,7 +19,7 @@ export default {
         k = 0,
         apun = 0;
       prodStack.push(199);
-      prodStack.push(300);
+      prodStack.push(200);
       do {
         x = prodStack.pop();
         k = "" + tokens[apun].code;
@@ -31,9 +31,10 @@ export default {
             if (tokens[apun].code == 199) {
               linea = tokens[apun - 1].line;
             }
+            console.log("acá");
             errors.push({
               id: 2,
-              value: "Error sintáctico",
+              value: `Error sintáctico: ${tokens[apun].value}`,
               line: linea,
               code: 201,
               type: 2,
@@ -51,9 +52,10 @@ export default {
             if (tokens[apun].code == 199) {
               linea = tokens[apun - 1].line;
             }
+            console.log("aqui");
             errors.push({
               id: 2,
-              value: "Error sintáctico",
+              value: `Error sintáctico: ${tokens[apun].value}`,
               line: linea,
               code: 201,
               type: 2,
@@ -90,11 +92,13 @@ export default {
   },
   getProduction(prod, k) {
     let term = this.getTerminal(k);
-    let index = prod % 300;
+    let index = 0;
+    prod >= 300 ? (index = (prod % 300) + 16) : (index = prod % 200);
+    console.log("return: ", rules[index][term]);
     return term !== -1 ? rules[index][term] : "0";
   },
   isTerminal(terminal) {
-    return terminal > 0 && terminal < 300;
+    return terminal > 0 && terminal < 200;
   },
   getTerminal(terminal) {
     switch (terminal) {
@@ -114,22 +118,40 @@ export default {
         return 6;
       case "15":
         return 7;
-      case "50":
+      case "16":
         return 8;
-      case "51":
+      case "18":
         return 9;
-      case "53":
+      case "19":
         return 10;
-      case "54":
+      case "20":
         return 11;
-      case "61":
+      case "22":
         return 12;
-      case "62":
+      case "24":
         return 13;
-      case "72":
+      case "25":
         return 14;
-      case "199":
+      case "26":
         return 15;
+      case "27":
+        return 16;
+      case "50":
+        return 17;
+      case "51":
+        return 18;
+      case "53":
+        return 19;
+      case "54":
+        return 20;
+      case "61":
+        return 21;
+      case "62":
+        return 22;
+      case "72":
+        return 23;
+      case "199":
+        return 24;
       default:
         return -1;
     }

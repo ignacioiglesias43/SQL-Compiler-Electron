@@ -49,7 +49,7 @@ export default {
     let line = 1;
     renglones.forEach((renglon) => {
       let cadena = this.changeQuoteMarks(renglon);
-      cadena = cadena.split(/(\s+|,|\(|\)|')/);
+      cadena = cadena.split(/(\s+|,|\(|\)|'|;)/);
       cadena.forEach((element) => {
         element = element.replace(/\s+/, "");
         if (element !== "") {
