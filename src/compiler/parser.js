@@ -31,14 +31,7 @@ export default {
             if (tokens[apun].code == 199) {
               linea = tokens[apun - 1].line;
             }
-            console.log("acá");
-            errors.push({
-              id: 2,
-              value: `Error sintáctico: ${tokens[apun].value}`,
-              line: linea,
-              code: 201,
-              type: 2,
-            });
+            this.errors(x, k, linea);
             return errors;
           }
         } else {
@@ -52,14 +45,7 @@ export default {
             if (tokens[apun].code == 199) {
               linea = tokens[apun - 1].line;
             }
-            console.log("aqui");
-            errors.push({
-              id: 2,
-              value: `Error sintáctico: ${tokens[apun].value}`,
-              line: linea,
-              code: 201,
-              type: 2,
-            });
+            this.errors(x, k, linea);
             return errors;
           }
         }
@@ -91,10 +77,12 @@ export default {
     }
   },
   getProduction(prod, k) {
+    if (k == 10) prod = 300;
+    else if (k == 16) prod = 200;
+    else if (k == 27) prod = 211;
     let term = this.getTerminal(k);
     let index = 0;
     prod >= 300 ? (index = (prod % 300) + 16) : (index = prod % 200);
-    console.log("return: ", rules[index][term]);
     return term !== -1 ? rules[index][term] : "0";
   },
   isTerminal(terminal) {
@@ -154,6 +142,175 @@ export default {
         return 24;
       default:
         return -1;
+    }
+  },
+  errors(x, k, line) {
+    if (x < 300) {
+      if (
+        x == 200 ||
+        x == 201 ||
+        x == 203 ||
+        x == 204 ||
+        x == 207 ||
+        x == 208 ||
+        x == 211 ||
+        x == 215
+      )
+        errors.push({
+          id: 2,
+          value: "Se esperaba palabra reservada",
+          line: line,
+          code: 201,
+          type: 2,
+        });
+      else if (x == 202 || x == 206)
+        errors.push({
+          id: 2,
+          value: "Se esperaba identificador",
+          line: line,
+          code: 204,
+          type: 2,
+        });
+      else if (x == 205 || x == 209 || x == 210 || x == 214 || x == 212)
+        errors.push({
+          id: 2,
+          value: "Se esperaba delimitador",
+          line: line,
+          code: 205,
+          type: 2,
+        });
+      else if (x == 213)
+        errors.push({
+          id: 2,
+          value: "Se esperaba constante",
+          line: line,
+          code: 206,
+          type: 2,
+        });
+      else if (x >= 10 && x <= 29)
+        errors.push({
+          id: 2,
+          value: "Se esperaba palabra reservada",
+          line: line,
+          code: 201,
+          type: 2,
+        });
+      else if (x >= 50 && x <= 55)
+        errors.push({
+          id: 2,
+          value: "Se esperaba delimitador",
+          line: line,
+          code: 205,
+          type: 2,
+        });
+      else if (x == 61 || x == 62)
+        errors.push({
+          id: 2,
+          value: "Se esperaba constante",
+          line: line,
+          code: 206,
+          type: 2,
+        });
+      else
+        errors.push({
+          id: 2,
+          value: "Se esperaba identificador",
+          line: line,
+          code: 204,
+          type: 2,
+        });
+    } else if (x >= 300) {
+      if (x == 305 && (k == 4 || k == 62))
+        errors.push({
+          id: 2,
+          value: "Se esperaba delimitador",
+          line: line,
+          code: 205,
+          type: 2,
+        });
+      else if (x == 316 && (k == 62 || k == 53))
+        errors.push({
+          id: 2,
+          value: "Se esperaba delimitador",
+          line: line,
+          code: 205,
+          type: 2,
+        });
+      else if (x == 305 && (k == 54 || k == 61))
+        errors.push({
+          id: 2,
+          value: "Se esperaba operador relacional",
+          line: line,
+          code: 208,
+          type: 2,
+        });
+      else if (x == 305 && k == 52)
+        errors.push({
+          id: 2,
+          value: "Se esperaba palabra reservada",
+          line: line,
+          code: 201,
+          type: 2,
+        });
+      else if (x == 300 || x == 310 || x == 312 || x == 317)
+        errors.push({
+          id: 2,
+          value: "Se esperaba palabra reservada",
+          line: line,
+          code: 201,
+          type: 2,
+        });
+      else if (
+        x == 301 ||
+        x == 302 ||
+        x == 304 ||
+        x == 305 ||
+        x == 306 ||
+        x == 308 ||
+        x == 309 ||
+        x == 311 ||
+        x == 313 ||
+        (x == 316 && k == 4)
+      )
+        errors.push({
+          id: 2,
+          value: "Se esperaba identificador",
+          line: line,
+          code: 204,
+          type: 2,
+        });
+      else if (x == 303 || x == 307)
+        errors.push({
+          id: 2,
+          value: "Se esperaba delimitador",
+          line: line,
+          code: 205,
+          type: 2,
+        });
+      else if (x == 314)
+        errors.push({
+          id: 2,
+          value: "Se esperaba operador relacional",
+          line: line,
+          code: 208,
+          type: 2,
+        });
+      else if (x == 318 || x == 319 || x == 316)
+        errors.push({
+          id: 2,
+          value: "Se esperaba constante",
+          line: line,
+          code: 206,
+          type: 2,
+        });
+    } else {
+      errors.push({
+        id: 2,
+        value: "Se esperaba delimitador",
+        line: line,
+        code: 205,
+        type: 2,
+      });
     }
   },
 };

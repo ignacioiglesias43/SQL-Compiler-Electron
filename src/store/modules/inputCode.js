@@ -1,13 +1,14 @@
 export default {
   namespaced: true,
   state: {
-    sampleText: `SELECT ANOMBRE, CALIFICACION, TURNO FROM ALUMNOS, INSCRITOS, MATERIAS,
-CARRERAS WHERE MNOMBRE = 'LENAUT2' AND TURNO = 'TM' AND CNOMBRE = 'ISC'
-AND SEMESTRE = '2017II' AND CALIFICACION >= 70`
+    sampleText: `CREATE TABLE DEPARTAMENTOS(
+D# CHAR(2) NOT NULL,
+DNOMBRE CHAR(6) NOT NULL,
+CONSTRAINT PK_DEPARTAMENTOS PRIMARY KEY (D#));`,
   },
   mutations: {
     SET_SAMPLE_TEXT(state, payload) {
       state.sampleText = payload;
-    }
-  }
+    },
+  },
 };
