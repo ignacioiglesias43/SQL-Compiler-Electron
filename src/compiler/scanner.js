@@ -121,12 +121,26 @@ export default {
     return Token;
   },
   addError(token, line) {
-    const error = {
-      value: "Error léxico: " + token,
-      line: line,
-      code: 101,
-      type: 1,
-    };
+    let error;
+    if (token.match(/\w+/)) {
+      error = {
+        value: "Elemento inválido: " + token,
+        line: line,
+        code: 102,
+        type: 1,
+      };
+    } else {
+      const newT = token.split("");
+      newT.forEach((t) => {
+        if (!/^\s*$/.test(t) && t !== "")
+          error = {
+            value: "Símbolo desconocido: " + token,
+            line: line,
+            code: 101,
+            type: 1,
+          };
+      });
+    }
     errorList.push(error);
   },
   getError() {
