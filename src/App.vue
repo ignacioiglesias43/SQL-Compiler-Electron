@@ -27,27 +27,31 @@ import InputCode from "./components/InputCode";
 import ErrorTable from "./components/ErrorTable";
 import Scanner from "../src/compiler/scanner";
 import Parser from "../src/compiler/parser";
+import Semantic from "../src/compiler/semantic.js";
 import { mapState, mapMutations } from "vuex";
 export default {
   name: "App",
   components: {
     InputCode,
-    ErrorTable,
+    ErrorTable
   },
   computed: {
     ...mapState("inputCode", ["sampleText"]),
     ...mapState("errorTable", ["errorTableData"]),
     value() {
       return this.sampleText;
-    },
+    }
   },
   methods: {
     ...mapMutations("errorTable", ["SET_ERROR_TABLE_DATA"]),
     compile(event) {
       event.preventDefault();
-      const result = Parser.algorithm(Scanner.scan(this.value));
+      const scan = Scanner.scan(this.value);
+      const result = Parser.algorithm(scan);
+      const sm = Semantic.fillTables(scan.tokens);
+      console.log(sm);
       this.SET_ERROR_TABLE_DATA(result);
-    },
-  },
+    }
+  }
 };
 </script>
