@@ -60,8 +60,9 @@ export default {
             tokens.forEach((token) => {
               this.addTokenToList(token, line);
             });
+          } else {
+            this.addTokenToList(element, line);
           }
-          this.addTokenToList(element, line);
         }
       });
       line++;
@@ -74,7 +75,7 @@ export default {
           : [
               {
                 id: 1,
-                value: "Sin error",
+                value: "Sin errores léxicos",
                 line: ":)",
                 code: 100,
                 type: 1,
@@ -85,7 +86,7 @@ export default {
   },
   addTokenToList(token, line) {
     const t = this.getToken(token, line);
-    if (Object.keys(t).length > 0) {
+    if (t !== -1) {
       if (!tokenList.includes(t)) {
         tokenList.push(t);
       }
@@ -94,7 +95,7 @@ export default {
     }
   },
   getToken(token, line) {
-    let Token = {};
+    let Token = -1;
     try {
       tokens.forEach((t) => {
         if (token.toUpperCase().match(t.regex)) {
