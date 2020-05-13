@@ -59,7 +59,9 @@ export default {
         );
       }
       if (token.code == 26) {
-        index = tables.findIndex((t) => t.name == token.value.toUpperCase());
+        index = tables.findIndex(
+          (t) => t.name == tokens[tokens.indexOf(token) + 1].value.toUpperCase()
+        );
         restrictions[index].table_number = index;
         restrictions[index].attribute = this.findAttrib(
           index,
