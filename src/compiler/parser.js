@@ -272,7 +272,7 @@ export default {
           code: 201,
           type: 2,
         });
-      else if (x == 300 || x == 310 || x == 312 || x == 317)
+      else if (x == 300 || x == 310 || x == 312 || x == 317 || x == 320)
         errors.push({
           id: 2,
           value: "Se esperaba palabra reservada",

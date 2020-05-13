@@ -186,6 +186,12 @@ const tokens = [
     type: 1,
   },
   {
+    regex: /^DISTINCT$/,
+    value: "DISTINCT",
+    code: 40,
+    type: 1,
+  },
+  {
     regex: /^,$/,
     value: ",",
     code: 50,
