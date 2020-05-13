@@ -1,6 +1,14 @@
 let tables = [],
   attributes = [],
   restrictions = [];
+let attrib = [],
+  aliasList = [],
+  aux = [],
+  tablas = [],
+  dmlTokens = [],
+  subTabla = [];
+let subQuery = false,
+  isComp = false;
 export default {
   fillTables(tokens) {
     let index = 0;
@@ -50,6 +58,14 @@ export default {
           )
         );
       }
+      if (token.code == 26) {
+        index = tables.findIndex((t) => t.name == token.value.toUpperCase());
+        restrictions[index].table_number = index;
+        restrictions[index].attribute = this.findAttrib(
+          index,
+          tokens[tokens.indexOf(token) + 3].value
+        );
+      }
     });
     return {
       tables: tables,
@@ -57,8 +73,154 @@ export default {
       restrictions: restrictions,
     };
   },
+  attrib(token) {
+    let p = dmlTokens[dmlTokens.findIndex((d) => d == token) + 1];
+    if (!isComp) {
+      if (attributes.find((a) => a.name === token.value.toUpperCase())) {
+        attrib.push(token);
+        return null;
+      } else {
+        console.log("atributo no compa");
+        return {
+          id: 3,
+          value: `El nombre del atributo ${token.value} no es válido`,
+          line: token.line,
+          code: 311,
+          type: 3,
+        };
+      }
+    } else if (p.value !== ".") {
+      if (!subQuery) {
+        return this.attribTable(token, tablas);
+      } else {
+        return this.attribTable(token, subTabla);
+      }
+    }
+    return null;
+  },
+  attribTable(token, table) {
+    let index = table.findIndex((t) => t.value == token.value);
+    if (this.findAttrib(index, token.value)) {
+      return null;
+    }
+    console.log("atrib in teibol dans");
+    return {
+      id: 3,
+      value: `El nombre del atributo ${token.value} no es válido`,
+      line: token.line,
+      code: 311,
+      type: 3,
+    };
+  },
+  defType(x) {
+    if (x == 10) {
+      isComp = false;
+      attrib = [];
+      aux = [];
+    }
+    if (x == 12) {
+      isComp = true;
+    }
+    if (x == 13) {
+      subTabla = [];
+      subQuery = true;
+      isComp = false;
+    }
+    if (x == 53) {
+      subQuery = false;
+    }
+  },
+  ambiwo(token) {
+    if (!subQuery) {
+      let index = tables.findIndex((t) => t.name == token.value);
+      for (let i = 0; i < attrib.length; i++) {
+        if (this.findAttrib(index, attrib[i].value.toUpperCase()) !== null) {
+          if (!aux.includes(token.value.toUpperCase()))
+            aux.push(token.value.toUpperCase());
+          else
+            return {
+              id: 3,
+              value: `El nombre del atributo ${attrib[i].value} es ambigüo`,
+              line: attrib[i].line,
+              code: 312,
+              type: 3,
+            };
+        }
+      }
+    }
+  },
+  table(token) {
+    if (tables.find((t) => t.name === token.value.toUpperCase())) {
+      subQuery ? tablas.push(token) : subTabla.push(token);
+      return this.ambiwo(token);
+    } else {
+      return {
+        id: 3,
+        value: `El nombre de la tabla ${token.value} no es válido`,
+        line: token.line,
+        code: 314,
+        type: 3,
+      };
+    }
+  },
+  tableAttribute(token) {
+    let table = dmlTokens[dmlTokens.indexOf(token) - 2];
+    let tableName = aliasList.find((alias) => alias == table.value);
+    if (tables.find((t) => t.name == token.value.toUpperCase())) {
+      let index = tables.findIndex(
+        (t) => t.name == tableName.value.toUpperCase()
+      );
+      if (this.findAttrib(index, token.value.toUpperCase())) {
+        return null;
+      }
+      console.log("tabla atributo");
+      return {
+        id: 3,
+        value: `El nombre del atributo ${token.value} no es válido`,
+        line: token.line,
+        code: 311,
+        type: 3,
+      };
+    } else {
+      return {
+        id: 3,
+        value: `El identificador ${token.value} no es válido`,
+        line: token.line,
+        code: 315,
+        type: 3,
+      };
+    }
+  },
+  alias(token) {
+    let tabla = dmlTokens[dmlTokens.indexOf(token) - 1];
+    aliasList.push({
+      alias: token.value,
+      table: tabla.value,
+    });
+  },
+  semanticAnalyze(x, token, tokens) {
+    dmlTokens = tokens;
+    this.defType(x);
+    if (x == 700) {
+      return this.attrib(token);
+    } else if (x == 701) {
+      return this.table(token);
+    } else if (x == 702) {
+      this.alias(token);
+      return null;
+    } else if (x == 703) {
+      return this.tableAttribute(token);
+    } else if (x == 704) {
+      return this.compararTipos(token);
+    } else {
+      return null;
+    }
+  },
+  compararTipos(token) {
+    console.log("tipos: ", token);
+  },
   findAttrib(table, attrib) {
-    let result = -1;
+    let result = null;
     attributes.forEach((a) => {
       if (a.table_number == table) {
         if (a.name === attrib) {

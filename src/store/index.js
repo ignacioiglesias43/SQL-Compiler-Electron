@@ -9,5 +9,5 @@ export default new Vuex.Store({
   state: {},
   mutations: {},
   actions: {},
-  modules: { inputCode, errorTable }
+  modules: { inputCode, errorTable },
 });

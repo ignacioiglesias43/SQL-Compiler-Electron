@@ -36,8 +36,8 @@ export default {
       },
       set(error) {
         this.SET_ERROR_TABLE_DATA(error);
-      }
-    }
-  }
+      },
+    },
+  },
 };
 </script>
