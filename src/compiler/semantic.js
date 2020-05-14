@@ -1,3 +1,5 @@
+import scanner from "./scanner";
+import createTables from "./utils/tables";
 let tables = [],
   attributes = [],
   restrictions = [];
@@ -150,6 +152,7 @@ export default {
         }
       }
     }
+    return null;
   },
   table(token) {
     if (tables.find((t) => t.name === token.value.toUpperCase())) {
@@ -175,7 +178,6 @@ export default {
       if (this.findAttrib(index, token.value.toUpperCase())) {
         return null;
       }
-      console.log("tabla atributo");
       return {
         id: 3,
         value: `El nombre del atributo ${token.value} no es válido`,
@@ -202,7 +204,10 @@ export default {
   },
   semanticAnalyze(x, token, tokens) {
     dmlTokens = tokens;
-    this.defType(x);
+    const result = this.fillTables(scanner.scan(createTables).tokens);
+    tables = result.tables;
+    attributes = result.attributes;
+    restrictions = result.restrictions;
     if (x == 700) {
       return this.attrib(token);
     } else if (x == 701) {
@@ -220,6 +225,7 @@ export default {
   },
   compararTipos(token) {
     console.log("tipos: ", token);
+    return null;
   },
   findAttrib(table, attrib) {
     let result = null;

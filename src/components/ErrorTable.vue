@@ -11,7 +11,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="error in errors" :key="error.id">
+          <tr v-for="error in errors" :key="errors.indexOf(error)">
             <td>{{ error.type }}</td>
             <td>{{ error.code }}</td>
             <td>{{ error.value }}</td>

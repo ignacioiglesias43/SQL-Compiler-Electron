@@ -1,5 +1,5 @@
 import rules from "./utils/rules";
-import semantic from "./semantic.js";
+import semantic from "./semantic";
 let prodStack = [];
 let tokens = [];
 let errors = [];
@@ -24,10 +24,20 @@ export default {
       do {
         x = prodStack.pop();
         k = "" + tokens[apun].code;
+        semantic.defType(x);
         if (x >= 700) {
           let error = semantic.semanticAnalyze(x, tokens[apun - 1], tokens);
           if (error !== null) {
-            errors.push(error);
+            errors.push(
+              {
+                id: 2,
+                value: "Sin errores sintácticos",
+                line: ":)",
+                code: 200,
+                type: 2,
+              },
+              error
+            );
             return errors;
           }
         } else {
