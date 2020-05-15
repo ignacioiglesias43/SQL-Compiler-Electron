@@ -280,7 +280,7 @@ export default {
         return null;
       }
     }
-    if (leftType !== rightType)
+    if (leftType !== rightType && leftType !== null && rightType !== null) {
       return {
         id: 3,
         value: `Error de conversión al convertir el valor del atributo ${left.value} de tipo ${leftType} a ${rightType}`,
@@ -288,6 +288,7 @@ export default {
         code: 313,
         type: 3,
       };
+    }
     return null;
   },
   getDataType(table, token) {
