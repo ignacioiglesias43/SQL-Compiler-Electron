@@ -6,6 +6,7 @@ let errors = [];
 export default {
   algorithm(data) {
     prodStack = [];
+    semantic.init();
     errors = data.errors;
     tokens = data.tokens;
     tokens.push({

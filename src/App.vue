@@ -105,6 +105,8 @@ export default {
             this.SET_RESULTS_TABLE_DATA(filas);
           }
         });
+      } else {
+        this.showResults = false;
       }
     },
     deleteText(event) {

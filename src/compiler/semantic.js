@@ -54,7 +54,10 @@ export default {
             tokens[tokens.indexOf(token) + 1].value,
             type === 1
               ? "-"
-              : this.findAttrib(index, tokens[tokens.indexOf(token) + 5].value),
+              : this.findAttrib(
+                  index,
+                  tokens[tokens.indexOf(token) + 5].value.toUpperCase()
+                ),
             index,
             type === 1 ? "-" : index
           )
@@ -67,7 +70,7 @@ export default {
         restrictions[index].table_number = index;
         restrictions[index].attribute = this.findAttrib(
           index,
-          tokens[tokens.indexOf(token) + 3].value
+          tokens[tokens.indexOf(token) + 3].value.toUpperCase()
         );
       }
     });
@@ -80,11 +83,13 @@ export default {
   attrib(token) {
     let p = dmlTokens[dmlTokens.findIndex((d) => d == token) + 1];
     if (!isComp) {
-      if (attributes.find((a) => a.name === token.value.toUpperCase())) {
+      let cons = attributes.find((a) => {
+        return a.name === token.value.toUpperCase();
+      });
+      if (cons) {
         attrib.push(token);
         return null;
       } else {
-        console.log("atributo no compa");
         return {
           id: 3,
           value: `El nombre del atributo ${token.value} no es válido`,
@@ -103,11 +108,12 @@ export default {
     return null;
   },
   attribTable(token, table) {
-    let index = table.findIndex((t) => t.value == token.value);
-    if (this.findAttrib(index, token.value)) {
+    let index = tables.findIndex((t) => {
+      return t.name === table[0].value.toUpperCase();
+    });
+    if (this.findAttrib(index, token.value.toUpperCase()) !== null) {
       return null;
     }
-    console.log("atrib in teibol dans");
     return {
       id: 3,
       value: `El nombre del atributo ${token.value} no es válido`,
@@ -136,7 +142,9 @@ export default {
   },
   ambiwo(token) {
     if (!subQuery) {
-      let index = tables.findIndex((t) => t.name == token.value);
+      let index = tables.findIndex((t) => {
+        return t.name === token.value.toUpperCase();
+      });
       for (let i = 0; i < attrib.length; i++) {
         if (this.findAttrib(index, attrib[i].value.toUpperCase()) !== null) {
           if (!aux.includes(token.value.toUpperCase()))
@@ -144,7 +152,7 @@ export default {
           else
             return {
               id: 3,
-              value: `El nombre del atributo ${attrib[i].value} es ambigüo`,
+              value: `El nombre del atributo ${attrib[i - 1].value} es ambigüo`,
               line: attrib[i].line,
               code: 312,
               type: 3,
@@ -154,9 +162,13 @@ export default {
     }
     return null;
   },
+  init() {
+    subQuery = false;
+    isComp = false;
+  },
   table(token) {
     if (tables.find((t) => t.name === token.value.toUpperCase())) {
-      subQuery ? tablas.push(token) : subTabla.push(token);
+      !subQuery ? tablas.push(token) : subTabla.push(token);
       return this.ambiwo(token);
     } else {
       return {
@@ -170,12 +182,19 @@ export default {
   },
   tableAttribute(token) {
     let table = dmlTokens[dmlTokens.indexOf(token) - 2];
-    let tableName = aliasList.find((alias) => alias == table.value);
-    if (tables.find((t) => t.name == token.value.toUpperCase())) {
-      let index = tables.findIndex(
-        (t) => t.name == tableName.value.toUpperCase()
-      );
-      if (this.findAttrib(index, token.value.toUpperCase())) {
+    let tableName = table.value.toUpperCase();
+    if (aliasList.length > 0) {
+      tableName = aliasList.find((alias) => {
+        return alias.alias === table.value.toUpperCase();
+      });
+      typeof tableName !== "undefined" && (tableName = tableName.table);
+    }
+    let cons = tables.find((t) => {
+      return t.name === tableName;
+    });
+    if (cons) {
+      let index = tables.findIndex((t) => t.name == tableName);
+      if (this.findAttrib(index, token.value.toUpperCase()) !== null) {
         return null;
       }
       return {
@@ -224,7 +243,65 @@ export default {
     }
   },
   compararTipos(token) {
-    console.log("tipos: ", token);
+    let isRight = tables.find((t) => {
+      return t.name === dmlTokens[dmlTokens.indexOf(token) + 1].value;
+    });
+    let table = dmlTokens[dmlTokens.indexOf(token) + 1];
+    let right = tables.find((t) => {
+      return t.name === table.value;
+    })
+      ? dmlTokens[dmlTokens.indexOf(token) + 3]
+      : table;
+    let left = dmlTokens[dmlTokens.indexOf(token) - 1];
+    let leftTable = null;
+    if (!subQuery) {
+      leftTable =
+        tablas.length < 2 ? tablas[0] : dmlTokens[dmlTokens.indexOf(token) - 3];
+    } else {
+      leftTable =
+        subTabla.length < 2
+          ? subTabla[0]
+          : dmlTokens[dmlTokens.indexOf(token) - 3];
+    }
+    let leftType = this.getDataType(leftTable, left);
+    let rightType = null;
+    if (isRight) {
+      rightType = this.getDataType(
+        dmlTokens[dmlTokens.indexOf(token) + 1],
+        right
+      );
+      if (rightType === null) return null;
+    } else {
+      if (right.code === 54) {
+        rightType = "CHAR";
+      } else if (right.code === 61) {
+        rightType = "INT";
+      } else {
+        return null;
+      }
+    }
+    if (leftType !== rightType)
+      return {
+        id: 3,
+        value: `Error de conversión al convertir el valor del atributo ${left.value} de tipo ${leftType} a ${rightType}`,
+        line: token.line,
+        code: 313,
+        type: 3,
+      };
+    return null;
+  },
+  getDataType(table, token) {
+    let tableIndx = tables.findIndex((t) => {
+      return t.name == table.value;
+    });
+    let tokenIndex = this.findAttrib(tableIndx, token.value.toUpperCase());
+    if (tokenIndex !== null) {
+      let type;
+      attributes[tokenIndex].type === "NUMERIC"
+        ? (type = "INT")
+        : (type = "CHAR");
+      return type;
+    }
     return null;
   },
   findAttrib(table, attrib) {
